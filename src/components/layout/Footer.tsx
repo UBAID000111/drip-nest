@@ -36,7 +36,7 @@ export const Footer: React.FC = () => {
                   href="tel:8218167743"
                   className="hover:text-[#234737] hover:underline font-medium"
                 >
-                  8218167743
+                  8218167743, 7895024033
                 </a>
               </div>
               <div className="flex items-center gap-2 pt-1 text-[11px] text-[#684631] font-mono">
