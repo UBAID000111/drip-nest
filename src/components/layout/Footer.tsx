@@ -161,15 +161,7 @@ export const Footer: React.FC = () => {
               Terms
             </Link>
             <span aria-hidden="true">·</span>
-            <a
-              href="/dripnest-vercel.zip"
-              download="dripnest-vercel.zip"
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#234737] text-[#F8F5EF] rounded hover:bg-[#1A3529] transition-colors font-medium text-[11px] shadow-xs"
-              title="Download complete project zip ready for Vercel upload"
-            >
-              <Download className="w-3 h-3" />
-              <span>Download for Vercel (.zip)</span>
-            </a>
+          
           </div>
         </div>
       </div>
