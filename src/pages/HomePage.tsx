@@ -20,8 +20,7 @@ import { ReviewCard } from '../components/reviews/ReviewCard';
 import { ReviewFormModal } from '../components/reviews/ReviewFormModal';
 import { SafeImage } from '../components/common/SafeImage';
 
-// Fallback images for category cards.
-// Existing Firestore images are preferred when available.
+// Category fallback images
 const CATEGORY_IMAGES: Record<string, string> = {
   'kitchen-and-home-accessories':
     'https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=800&q=80',
@@ -39,6 +38,15 @@ const CATEGORY_IMAGES: Record<string, string> = {
     'https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&w=800&q=80',
 };
 
+// Hero and brand story images
+const CRAFT_IMAGES = {
+  artisanalLiving:
+    'https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&w=1200&q=85',
+
+  woodcraft:
+    'https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&w=1200&q=85',
+};
+
 const getCategoryImage = (category: Category): string => {
   return (
     category.imageUrl ||
@@ -50,7 +58,9 @@ const getCategoryImage = (category: Category): string => {
 
 export const HomePage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] =
+    useState<Product | null>(null);
+
   const [categories, setCategories] = useState<Category[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [averageRating, setAverageRating] = useState<number>(0);
@@ -63,11 +73,12 @@ export const HomePage: React.FC = () => {
   const [lastVisible, setLastVisible] = useState<any>(null);
   const [productError, setProductError] = useState<string | null>(null);
 
-  // Filters
+  // Product filters
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<
     'newest' | 'priceAsc' | 'priceDesc' | 'name'
   >('newest');
+
   const [onlyInStock, setOnlyInStock] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -76,6 +87,7 @@ export const HomePage: React.FC = () => {
 
   const collectionRef = useRef<HTMLDivElement>(null);
   const craftRef = useRef<HTMLDivElement>(null);
+
   const navigate = useNavigate();
 
   // Load initial store data
@@ -89,7 +101,7 @@ export const HomePage: React.FC = () => {
 
         setSettings(loadedSettings);
 
-        // Use default categories if Firestore has none.
+        // Display default categories if Firestore has none
         if (loadedCats.length === 0) {
           const defaultCats: Category[] = [
             {
@@ -181,18 +193,18 @@ export const HomePage: React.FC = () => {
       let fetched = res.products;
 
       if (onlyInStock) {
-        fetched = fetched.filter((p) => p.stockQuantity > 0);
+        fetched = fetched.filter((product) => product.stockQuantity > 0);
       }
 
       if (isNewQuery) {
         setProducts(fetched);
       } else {
-        setProducts((prev) => [...prev, ...fetched]);
+        setProducts((previous) => [...previous, ...fetched]);
       }
 
       setLastVisible(res.lastVisible);
       setHasMore(res.hasMore);
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error fetching products:', err);
       setProductError('Unable to load collection from Firestore.');
     } finally {
@@ -292,13 +304,16 @@ export const HomePage: React.FC = () => {
               </div>
             </div>
 
-            {/* Hero Lifestyle Image */}
+            {/* Hero Image: Artisanal Wooden Living */}
             <div className="lg:col-span-6 relative">
               <div className="relative aspect-[4/3] sm:aspect-[16/10] rounded-xl overflow-hidden shadow-xl border border-[#EFE6D7] bg-[#EFE6D7]">
                 <SafeImage
-                  src={settings?.homepage?.heroImageUrl}
-                  alt="DripNest handcrafted wooden trays, tumblers, and homeware arranged in a naturally lit warm home"
-                  fallbackText="DripNest Wooden Tableware & Living"
+                  src={
+                    settings?.homepage?.heroImageUrl ||
+                    CRAFT_IMAGES.artisanalLiving
+                  }
+                  alt="Artisanal Wooden Living — handcrafted wooden trays, tumblers and tableware"
+                  fallbackText="Artisanal Wooden Living"
                   className="w-full h-full object-cover"
                 />
 
@@ -350,30 +365,30 @@ export const HomePage: React.FC = () => {
           </Link>
         </div>
 
-        {/* Categories Grid with fallback images */}
+        {/* Category Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
           {categories.map((cat) => (
             <div
               key={cat.id}
-              onClick={() => navigate(`/shop?category=${cat.id}`)}
+              onClick={() =>
+                navigate(`/shop?category=${encodeURIComponent(cat.id)}`)
+              }
               className="group cursor-pointer bg-white border border-[#EFE6D7] rounded-lg overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-1 flex flex-col justify-between"
             >
-              {/* Category Image */}
               <div className="relative aspect-[4/3] bg-[#EFE6D7] overflow-hidden">
                 <img
                   src={getCategoryImage(cat)}
                   alt={cat.name}
                   loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  onError={(e) => {
-                    const img = e.currentTarget;
-                    img.onerror = null;
-                    img.src = CATEGORY_IMAGES['home-decor'];
+                  onError={(event) => {
+                    const image = event.currentTarget;
+                    image.onerror = null;
+                    image.src = CATEGORY_IMAGES['home-decor'];
                   }}
                 />
               </div>
 
-              {/* Category Information */}
               <div className="p-4 flex flex-col flex-1 justify-between">
                 <div>
                   <h3 className="font-serif text-lg font-semibold text-[#252A24] group-hover:text-[#234737] transition-colors leading-snug">
@@ -435,25 +450,37 @@ export const HomePage: React.FC = () => {
           onLoadMore={() => fetchProductList(false)}
           error={productError}
           onRetry={() => fetchProductList(true)}
-          onProductClick={(prod) => setSelectedProduct(prod)}
+          onProductClick={(product) => setSelectedProduct(product)}
         />
       </section>
 
-      {/* 4. Brand Story Section */}
+      {/* 4. Brand Story: DripNest Woodcraft & Timeless Living */}
       <section
         ref={craftRef}
         className="bg-[#EFE6D7]/50 border-y border-[#EFE6D7] py-16 sm:py-24"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            {/* Story Visual */}
+            {/* Woodcraft Story Image */}
             <div className="lg:col-span-6">
               <div className="relative aspect-[4/3] rounded-xl overflow-hidden shadow-lg border border-[#DED3C1] bg-[#EFE6D7]">
                 <SafeImage
-                  alt="Artisan hands smoothing handcrafted wooden homeware"
+                  src={CRAFT_IMAGES.woodcraft}
+                  alt="DripNest Woodcraft & Timeless Living — handcrafted wooden home accessories"
                   fallbackText="DripNest Woodcraft & Timeless Living"
                   className="w-full h-full object-cover"
                 />
+
+                <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
+
+                <div className="absolute bottom-4 left-4 right-4 p-4 bg-white/90 backdrop-blur-md rounded-lg border border-white/40 shadow-xs">
+                  <span className="block text-xs font-semibold text-[#234737]">
+                    DripNest Woodcraft
+                  </span>
+                  <span className="text-[11px] text-[#252A24]/70">
+                    Timeless Living · Natural Character
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -487,7 +514,7 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 5. Customer Reviews Section */}
+      {/* 5. Customer Reviews */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
           <div>
@@ -503,9 +530,11 @@ export const HomePage: React.FC = () => {
               {totalReviews > 0 && (
                 <div className="flex items-center gap-1 bg-white border border-[#EFE6D7] px-2.5 py-1 rounded-md text-xs">
                   <Star className="w-3.5 h-3.5 fill-[#684631] text-[#684631]" />
+
                   <span className="font-bold tabular-nums text-[#234737]">
                     {averageRating}
                   </span>
+
                   <span className="text-[#252A24]/60">
                     ({totalReviews})
                   </span>
@@ -560,8 +589,8 @@ export const HomePage: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {reviews.map((rev) => (
-              <ReviewCard key={rev.id} review={rev} />
+            {reviews.map((review) => (
+              <ReviewCard key={review.id} review={review} />
             ))}
           </div>
         )}
@@ -572,8 +601,8 @@ export const HomePage: React.FC = () => {
         isOpen={reviewModalOpen}
         onClose={() => setReviewModalOpen(false)}
         onReviewSubmitted={async () => {
-          const revs = await getApprovedReviews();
-          setReviews(revs.reviews.slice(0, 3));
+          const reviewData = await getApprovedReviews();
+          setReviews(reviewData.reviews.slice(0, 3));
         }}
       />
 
