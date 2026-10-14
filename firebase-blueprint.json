@@ -1,0 +1,107 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "Handcrafted wooden homeware or lifestyle item in the DripNest catalog",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 150 },
+        "slug": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "description": { "type": "string", "maxLength": 5000 },
+        "categoryId": { "type": "string", "maxLength": 128 },
+        "categoryName": { "type": "string", "maxLength": 150 },
+        "price": { "type": "number" },
+        "compareAtPrice": { "type": "number" },
+        "images": { "type": "array" },
+        "material": { "type": "string", "maxLength": 200 },
+        "dimensions": { "type": "string", "maxLength": 200 },
+        "careInstructions": { "type": "string", "maxLength": 2000 },
+        "stockQuantity": { "type": "number" },
+        "status": { "type": "string", "enum": ["active", "inactive"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "slug", "categoryId", "price", "stockQuantity", "status"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Product taxonomy category for DripNest catalog",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "slug": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "sortOrder": { "type": "number" },
+        "active": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "slug", "active", "sortOrder"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "Customer feedback and rating submitted for store or product",
+      "type": "object",
+      "properties": {
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "email": { "type": "string", "maxLength": 150 },
+        "rating": { "type": "number" },
+        "comment": { "type": "string", "minLength": 5, "maxLength": 1500 },
+        "productId": { "type": "string", "maxLength": 128 },
+        "productName": { "type": "string", "maxLength": 150 },
+        "status": { "type": "string", "enum": ["pending", "approved", "hidden"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["displayName", "rating", "comment", "status"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Authorized administrator record",
+      "type": "object",
+      "properties": {
+        "role": { "type": "string", "enum": ["admin"] },
+        "email": { "type": "string", "maxLength": 150 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["role"]
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Configurable store parameters and policies",
+      "type": "object",
+      "properties": {
+        "general": { "type": "object" },
+        "homepage": { "type": "object" },
+        "product": { "type": "object" },
+        "review": { "type": "object" },
+        "contact": { "type": "object" },
+        "seo": { "type": "object" },
+        "legal": { "type": "object" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Products available in the store"
+    },
+    "/categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/Category" },
+      "description": "Taxonomy categories for filtering"
+    },
+    "/reviews/{reviewId}": {
+      "schema": { "$ref": "#/entities/Review" },
+      "description": "Customer reviews with moderation status"
+    },
+    "/admins/{uid}": {
+      "schema": { "$ref": "#/entities/Admin" },
+      "description": "Authorized administrator records indexed by user UID"
+    },
+    "/settings/{settingsDoc}": {
+      "schema": { "$ref": "#/entities/Settings" },
+      "description": "Store configuration and policy documents"
+    }
+  }
+}

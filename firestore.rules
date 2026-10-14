@@ -1,0 +1,120 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && (
+          (request.auth.token.email != null && request.auth.token.email.lower() == "ubaidji07@gmail.com")
+          ||
+          (
+            exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+            && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == "admin"
+          )
+        );
+    }
+
+    // Products: public can read active products.
+    // Only verified admins can create, update, or delete products.
+    match /products/{productId} {
+      allow read: if resource.data.status == "active"
+                  || isAdmin();
+
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Media Files: product and category images stored directly in Firestore.
+    // Public read so shoppers can view images; Admin write for uploads.
+    match /media_files/{mediaId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Categories: public can read active categories.
+    match /categories/{categoryId} {
+      allow read: if resource.data.active == true
+                  || isAdmin();
+
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Public can read approved reviews only.
+    // Anyone may submit a valid review, but it must be pending.
+    match /reviews/{reviewId} {
+      allow read: if resource.data.status == "approved"
+                  || isAdmin();
+
+      allow create: if
+        request.resource.data.keys().hasAll([
+          "displayName",
+          "email",
+          "rating",
+          "comment",
+          "status",
+          "createdAt"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "displayName",
+          "email",
+          "rating",
+          "comment",
+          "productId",
+          "productName",
+          "status",
+          "createdAt"
+        ])
+        && request.resource.data.status == "pending"
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() >= 2
+        && request.resource.data.displayName.size() <= 60
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 254
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.comment is string
+        && request.resource.data.comment.size() >= 5
+        && request.resource.data.comment.size() <= 1500
+        && request.resource.data.createdAt == request.time
+        && (
+          !("productId" in request.resource.data)
+          || request.resource.data.productId is string
+        )
+        && (
+          !("productName" in request.resource.data)
+          || request.resource.data.productName is string
+        );
+
+      // Only an admin can moderate or delete reviews.
+      allow update, delete: if isAdmin();
+    }
+
+    // Admin authorization documents are provisioned manually
+    // or by a trusted server using Firebase Admin SDK.
+    match /admins/{uid} {
+      allow read: if isAdmin()
+                  || (signedIn() && request.auth.uid == uid);
+
+      allow write: if signedIn() && (
+        (request.auth.token.email != null && request.auth.token.email.lower() == "ubaidji07@gmail.com")
+        || isAdmin()
+      );
+    }
+
+    // Public store settings are readable; changes require admin.
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Everything else is denied.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

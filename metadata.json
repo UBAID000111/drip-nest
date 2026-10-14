@@ -1,0 +1,7 @@
+{
+  "name": "DripNest — Premium Handcrafted Wooden Homeware",
+  "description": "Handcrafted warmth. Timeless living. Premium handcrafted wooden homeware, dining accessories, drinkware, and home decor.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
