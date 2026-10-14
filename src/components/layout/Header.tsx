@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Search, Menu, X, ArrowRight, ShieldCheck, Download } from 'lucide-react';
+import {
+  ShoppingBag,
+  Search,
+  Menu,
+  X,
+  ArrowRight,
+  ShieldCheck,
+} from 'lucide-react';
 import { BrandLogo } from '../common/BrandLogo';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
@@ -8,7 +15,10 @@ import { useAuth } from '../../context/AuthContext';
 const NAV_ITEMS = [
   { label: 'Home', path: '/' },
   { label: 'Shop', path: '/shop' },
-  { label: 'Kitchen & Home', path: '/category/kitchen-and-home-accessories' },
+  {
+    label: 'Kitchen & Home',
+    path: '/category/kitchen-and-home-accessories',
+  },
   { label: 'Drinkware', path: '/category/drinkware' },
   { label: 'Dining', path: '/category/dining' },
   { label: 'Home Decor', path: '/category/home-decor' },
@@ -31,11 +41,13 @@ export const Header: React.FC = () => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu on route change
+  // Close mobile menu and search on route change
   useEffect(() => {
     setMobileMenuOpen(false);
     setSearchOpen(false);
@@ -43,6 +55,7 @@ export const Header: React.FC = () => {
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
     if (searchQuery.trim()) {
       navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
       setSearchOpen(false);
@@ -59,19 +72,11 @@ export const Header: React.FC = () => {
             : 'bg-[#F8F5EF] border-b border-transparent'
         }`}
       >
-        {/* Top announcement micro-bar with one-click download */}
-        <div className="bg-[#234737] text-[#F8F5EF] text-[11px] tracking-wider uppercase font-medium py-1.5 px-4 flex items-center justify-center gap-3 flex-wrap text-center">
-          <span>Handcrafted warmth · Hand-finished in natural woods</span>
-          <span className="opacity-40 hidden sm:inline">|</span>
-          <a
-            href="/dripnest-vercel.zip"
-            download="dripnest-vercel.zip"
-            className="inline-flex items-center gap-1.5 font-bold text-[#EFE6D7] hover:text-white underline decoration-[#C7A364] decoration-2 underline-offset-2 transition-colors cursor-pointer"
-            title="One-click download of full project zip for Vercel deployment"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>One-Click Download (.ZIP for Vercel)</span>
-          </a>
+        {/* Top announcement bar */}
+        <div className="bg-[#234737] text-[#F8F5EF] text-[11px] tracking-wider uppercase font-medium py-1.5 px-4 text-center">
+          <span>
+            Handcrafted warmth · Hand-finished in natural woods
+          </span>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -81,10 +86,11 @@ export const Header: React.FC = () => {
               <BrandLogo showTagline={true} />
             </div>
 
-            {/* Zone 2: Navigation Links (Desktop) */}
+            {/* Zone 2: Desktop Navigation */}
             <nav className="hidden xl:flex items-center gap-6 text-[13px] font-medium tracking-wide text-[#252A24]/80">
               {NAV_ITEMS.map((item) => {
                 const isActive = location.pathname === item.path;
+
                 return (
                   <Link
                     key={item.path}
@@ -94,6 +100,7 @@ export const Header: React.FC = () => {
                     }`}
                   >
                     {item.label}
+
                     {isActive && (
                       <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-[#234737]" />
                     )}
@@ -102,25 +109,15 @@ export const Header: React.FC = () => {
               })}
             </nav>
 
-            {/* Zone 3: Actions (Export ZIP, Search, Cart, Mobile Toggle) */}
+            {/* Zone 3: Search, Cart & Mobile Toggle */}
             <div className="flex items-center gap-2.5 shrink-0">
-              {/* One-click ZIP download */}
-              <a
-                href="/dripnest-vercel.zip"
-                download="dripnest-vercel.zip"
-                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md bg-[#234737] text-[#F8F5EF] hover:bg-[#1C382C] transition-all shadow-xs"
-                title="Download full project zip for Vercel"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Download ZIP</span>
-              </a>
-
               {/* Search Toggle Button */}
               <button
                 type="button"
                 onClick={() => setSearchOpen(!searchOpen)}
                 className="p-2 text-[#252A24] hover:text-[#234737] hover:bg-[#EFE6D7]/50 rounded-full transition-colors"
                 aria-label="Search products"
+                aria-expanded={searchOpen}
               >
                 <Search className="w-5 h-5" />
               </button>
@@ -133,6 +130,7 @@ export const Header: React.FC = () => {
                 aria-label={`Shopping cart with ${totalItemCount} items`}
               >
                 <ShoppingBag className="w-5 h-5" />
+
                 {totalItemCount > 0 && (
                   <span className="absolute -top-1 -right-1 min-w-[20px] h-[20px] rounded-full bg-[#234737] text-[#F8F5EF] text-[11px] font-semibold flex items-center justify-center px-1 shadow-xs">
                     {totalItemCount}
@@ -146,6 +144,7 @@ export const Header: React.FC = () => {
                 onClick={() => setMobileMenuOpen(true)}
                 className="xl:hidden p-2 text-[#252A24] hover:text-[#234737] hover:bg-[#EFE6D7]/50 rounded-md transition-colors"
                 aria-label="Open mobile navigation menu"
+                aria-expanded={mobileMenuOpen}
               >
                 <Menu className="w-6 h-6" />
               </button>
@@ -157,8 +156,12 @@ export const Header: React.FC = () => {
         {searchOpen && (
           <div className="border-t border-[#EFE6D7] bg-[#F8F5EF] px-4 py-3 shadow-inner">
             <div className="max-w-2xl mx-auto">
-              <form onSubmit={handleSearchSubmit} className="relative flex items-center">
+              <form
+                onSubmit={handleSearchSubmit}
+                className="relative flex items-center"
+              >
                 <Search className="absolute left-3.5 w-4 h-4 text-[#684631]" />
+
                 <input
                   type="text"
                   placeholder="Search handcrafted homeware, bowls, drinkware, trays..."
@@ -167,6 +170,7 @@ export const Header: React.FC = () => {
                   autoFocus
                   className="w-full pl-10 pr-24 py-2.5 bg-white border border-[#EFE6D7] rounded-md text-sm text-[#252A24] placeholder-[#252A24]/40 focus:outline-none focus:border-[#234737] focus:ring-1 focus:ring-[#234737]"
                 />
+
                 <button
                   type="submit"
                   className="absolute right-1.5 px-3 py-1.5 bg-[#234737] text-white text-xs font-medium rounded hover:bg-[#1A3529] transition-colors"
@@ -188,10 +192,11 @@ export const Header: React.FC = () => {
             onClick={() => setMobileMenuOpen(false)}
           />
 
-          {/* Drawer panel */}
+          {/* Drawer Panel */}
           <div className="relative ml-auto w-full max-w-xs bg-[#F8F5EF] h-full shadow-2xl flex flex-col p-6 z-10 overflow-y-auto">
             <div className="flex items-center justify-between pb-4 border-b border-[#EFE6D7]">
               <BrandLogo />
+
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(false)}
@@ -202,10 +207,11 @@ export const Header: React.FC = () => {
               </button>
             </div>
 
-            {/* Mobile Nav Links */}
+            {/* Mobile Navigation Links */}
             <div className="py-6 flex flex-col gap-1">
               {NAV_ITEMS.map((item) => {
                 const isActive = location.pathname === item.path;
+
                 return (
                   <Link
                     key={item.path}
@@ -223,39 +229,60 @@ export const Header: React.FC = () => {
               })}
             </div>
 
-            {/* Admin Portal Button in Hamburger */}
+            {/* Admin Portal Button */}
             <div className="py-3 px-1 border-t border-[#EFE6D7]/80">
               <Link
-                to={currentUser && isAdmin ? "/admin" : "/admin/login"}
+                to={
+                  currentUser && isAdmin
+                    ? '/admin'
+                    : '/admin/login'
+                }
                 onClick={() => setMobileMenuOpen(false)}
                 className="w-full flex items-center justify-between px-3.5 py-3 rounded-md bg-[#234737] text-[#F8F5EF] text-xs font-semibold uppercase tracking-wider hover:bg-[#1A3529] active:scale-[0.99] transition-all shadow-xs"
               >
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-[#A7B59A]" />
-                  <span>{currentUser && isAdmin ? 'Admin Dashboard' : 'Admin Portal'}</span>
+
+                  <span>
+                    {currentUser && isAdmin
+                      ? 'Admin Dashboard'
+                      : 'Admin Portal'}
+                  </span>
                 </div>
+
                 <ArrowRight className="w-3.5 h-3.5 opacity-80" />
               </Link>
+
               {currentUser?.email && (
                 <div className="mt-2 px-1 text-[11px] text-[#252A24]/60 truncate flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 inline-block"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 inline-block" />
                   <span>{currentUser.email}</span>
                 </div>
               )}
             </div>
 
-            {/* Contact Micro-Bar */}
+            {/* Contact Section */}
             <div className="mt-auto pt-6 border-t border-[#EFE6D7] text-xs text-[#252A24]/70 space-y-2">
-              <p className="font-serif italic text-sm text-[#234737]">“Bring Nature Home.”</p>
+              <p className="font-serif italic text-sm text-[#234737]">
+                “Bring Nature Home.”
+              </p>
+
               <p>
                 Inquiries:{' '}
-                <a href="mailto:ubaidji07@gmail.com" className="text-[#234737] underline">
+                <a
+                  href="mailto:ubaidji07@gmail.com"
+                  className="text-[#234737] underline"
+                >
                   ubaidji07@gmail.com
                 </a>
               </p>
+
               <p>
                 Call:{' '}
-                <a href="tel:8218167743" className="text-[#234737] underline">
+                <a
+                  href="tel:8218167743"
+                  className="text-[#234737] underline"
+                >
                   8218167743
                 </a>
               </p>
