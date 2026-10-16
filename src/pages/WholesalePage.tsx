@@ -1,100 +1,113 @@
-
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowRight,
-  Package,
   Search,
-  ShoppingBag,
   MessageCircle,
-  Truck,
-  BadgePercent,
-  Loader2,
+  RefreshCw,
   AlertCircle,
+  Package,
+  ArrowRight,
+  ShoppingBag,
 } from 'lucide-react';
-import { Product } from '../types';
+
 import { getProducts } from '../services/productService';
+import { Product } from '../types';
 import { SafeImage } from '../components/common/SafeImage';
 
 const WHATSAPP_NUMBER = '918218167743';
 
 export const WholesalePage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [error, setError] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
+  const loadProducts = useCallback(async () => {
+    setLoading(true);
+    setError(false);
 
-    async function loadProducts() {
-      try {
-        const result = await getProducts();
+    try {
+      const result = await getProducts({
+        onlyActive: true,
+        limitCount: 100,
+        sortBy: 'newest',
+      });
 
-        if (cancelled) return;
+      const wholesaleProducts = result.products.filter((product) => {
+        const wholesalePrice = Number(product.wholesalePrice);
 
-        const wholesaleProducts = result.filter(
-          (product) =>
-            product.status === 'active' &&
-            typeof product.wholesalePrice === 'number' &&
-            product.wholesalePrice > 0
+        return (
+          product.status === 'active' &&
+          product.wholesalePrice !== null &&
+          product.wholesalePrice !== undefined &&
+          Number.isFinite(wholesalePrice) &&
+          wholesalePrice > 0
         );
+      });
 
-        setProducts(wholesaleProducts);
-      } catch (err) {
-        console.error('Failed to load wholesale products:', err);
-
-        if (!cancelled) {
-          setError(
-            'Wholesale products could not be loaded. Please try again later.'
-          );
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
+      setProducts(wholesaleProducts);
+    } catch (err) {
+      console.error('Wholesale products loading failed:', err);
+      setError(true);
+      setProducts([]);
+    } finally {
+      setLoading(false);
     }
-
-    loadProducts();
-
-    return () => {
-      cancelled = true;
-    };
   }, []);
 
+  useEffect(() => {
+    void loadProducts();
+  }, [loadProducts]);
+
   const filteredProducts = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
+    const term = searchTerm.trim().toLowerCase();
 
-    if (!query) return products;
+    if (!term) return products;
 
-    return products.filter(
-      (product) =>
-        product.name.toLowerCase().includes(query) ||
-        product.categoryName.toLowerCase().includes(query) ||
-        product.description.toLowerCase().includes(query)
-    );
-  }, [products, searchQuery]);
+    return products.filter((product) => {
+      const name = product.name?.toLowerCase() || '';
+      const description = product.description?.toLowerCase() || '';
+      const category = product.categoryName?.toLowerCase() || '';
 
-  const formatPrice = (price: number) =>
-    new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0,
-    }).format(price);
+      return (
+        name.includes(term) ||
+        description.includes(term) ||
+        category.includes(term)
+      );
+    });
+  }, [products, searchTerm]);
+
+  const getMinimumQuantity = (product: Product) => {
+    const quantity = Number(product.minimumWholesaleQuantity);
+
+    return Number.isFinite(quantity) && quantity > 0
+      ? Math.ceil(quantity)
+      : 1;
+  };
+
+  const getProductImage = (product: Product): string => {
+    const images = product.images;
+
+    if (!images || images.length === 0) return '';
+
+    const firstImage = images[0];
+
+    if (typeof firstImage === 'string') {
+      return firstImage;
+    }
+
+    return '';
+  };
 
   const getWhatsAppLink = (product: Product) => {
-    const quantity = product.minimumWholesaleQuantity ?? 1;
-
     const message = [
-      'Hello DripNest, I am interested in wholesale purchasing.',
+      'Hello DripNest, I am interested in a wholesale order.',
       '',
       `Product: ${product.name}`,
-      `Wholesale price shown: ${formatPrice(product.wholesalePrice!)}`,
-      `Minimum quantity: ${quantity} pieces`,
-      `Product link: ${window.location.origin}/product/${product.slug}`,
+      `Wholesale price: ₹${Number(product.wholesalePrice).toLocaleString('en-IN')}`,
+      `Minimum order quantity: ${getMinimumQuantity(product)}`,
       '',
-      'Please share bulk order details and shipping information.',
+      'Please share availability, bulk pricing and shipping details.',
     ].join('\n');
 
     return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
@@ -103,248 +116,218 @@ export const WholesalePage: React.FC = () => {
   return (
     <main className="min-h-screen bg-[#F8F5EF] text-[#252A24]">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-[#234737] text-[#F8F5EF]">
-        <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <div className="absolute -top-24 -right-12 w-80 h-80 rounded-full border border-white" />
-          <div className="absolute -top-12 -right-0 w-60 h-60 rounded-full border border-white" />
-          <div className="absolute -bottom-32 -left-20 w-80 h-80 rounded-full border border-white" />
-        </div>
+      <section className="bg-[#234737] text-[#F8F5EF]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+          <p className="text-xs sm:text-sm uppercase tracking-[0.2em] text-[#D8C8AC] mb-4">
+            DripNest Wholesale
+          </p>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-          <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-[#D7C6A4] font-semibold">
-              <BadgePercent className="w-4 h-4" />
-              DripNest Wholesale
-            </span>
+          <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl leading-tight max-w-3xl">
+            Thoughtful products.
+            <br />
+            Better bulk buying.
+          </h1>
 
-            <h1 className="mt-5 font-serif text-4xl sm:text-5xl lg:text-6xl leading-tight">
-              Beautiful craftsmanship.
-              <span className="block text-[#D7C6A4]">
-                Better bulk pricing.
-              </span>
-            </h1>
+          <p className="mt-5 max-w-2xl text-sm sm:text-base lg:text-lg leading-7 text-white/80">
+            Discover handcrafted wooden homeware and decor for retailers,
+            resellers, businesses and bulk buyers.
+          </p>
 
-            <p className="mt-5 max-w-2xl text-sm sm:text-base leading-7 text-white/75">
-              Discover wooden homeware and handcrafted products at our listed
-              wholesale rates. Explore products, check minimum order quantities,
-              and contact us for bulk order assistance.
-            </p>
-
-            <a
-              href="#wholesale-products"
-              className="mt-8 inline-flex items-center gap-2 rounded-md bg-[#F8F5EF] px-5 py-3 text-sm font-semibold text-[#234737] hover:bg-white transition-colors"
-            >
-              Explore Wholesale Products
-              <ArrowRight className="w-4 h-4" />
-            </a>
-          </div>
-
-          <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="border border-white/15 bg-white/5 rounded-lg p-4">
-              <Package className="w-5 h-5 text-[#D7C6A4]" />
-              <h2 className="mt-3 text-sm font-semibold">Bulk Orders</h2>
-              <p className="mt-1 text-xs leading-5 text-white/65">
-                Minimum quantities shown for eligible products.
-              </p>
-            </div>
-
-            <div className="border border-white/15 bg-white/5 rounded-lg p-4">
-              <BadgePercent className="w-5 h-5 text-[#D7C6A4]" />
-              <h2 className="mt-3 text-sm font-semibold">Listed Wholesale Rates</h2>
-              <p className="mt-1 text-xs leading-5 text-white/65">
-                View the wholesale price set for each product.
-              </p>
-            </div>
-
-            <div className="border border-white/15 bg-white/5 rounded-lg p-4">
-              <Truck className="w-5 h-5 text-[#D7C6A4]" />
-              <h2 className="mt-3 text-sm font-semibold">Bulk Order Assistance</h2>
-              <p className="mt-1 text-xs leading-5 text-white/65">
-                Contact us to discuss delivery and order details.
-              </p>
-            </div>
-          </div>
+          <a
+            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+              'Hello DripNest, I would like to enquire about wholesale orders.'
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 mt-7 px-6 py-3 rounded-md bg-[#F8F5EF] text-[#234737] font-semibold text-sm hover:bg-white transition-colors"
+          >
+            <MessageCircle className="w-5 h-5" />
+            Enquire for Bulk Orders
+          </a>
         </div>
       </section>
 
       {/* Product listing */}
-      <section
-        id="wholesale-products"
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16"
-      >
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5 mb-8">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-7">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#684631]">
-              Bulk buyer collection
-            </p>
-
-            <h2 className="mt-2 font-serif text-3xl sm:text-4xl text-[#234737]">
-              Wholesale Products
+            <h2 className="font-serif text-3xl sm:text-4xl text-[#234737]">
+              Wholesale Collection
             </h2>
 
             <p className="mt-2 text-sm text-[#252A24]/65">
-              Explore products with wholesale pricing available.
+              {loading
+                ? 'Loading wholesale products...'
+                : `${filteredProducts.length} ${
+                    filteredProducts.length === 1 ? 'product' : 'products'
+                  } available`}
             </p>
           </div>
 
-          <div className="text-xs text-[#252A24]/60">
-            {loading
-              ? 'Loading products...'
-              : `${filteredProducts.length} products available`}
+          <div className="text-sm text-[#684631]">
+            <Package className="inline-block w-4 h-4 mr-1.5" />
+            Bulk order enquiries welcome
           </div>
         </div>
 
         {/* Search */}
-        <div className="mb-8 max-w-xl relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#684631]" />
+        <div className="relative mb-8">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#684631]" />
 
           <input
             type="search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
             placeholder="Search wholesale products..."
             aria-label="Search wholesale products"
-            className="w-full pl-10 pr-4 py-3 bg-white border border-[#EFE6D7] rounded-md text-sm focus:outline-none focus:border-[#234737]"
+            className="w-full rounded-xl border border-[#E8DDCB] bg-white py-4 pl-12 pr-4 text-base outline-none transition focus:border-[#234737] focus:ring-2 focus:ring-[#234737]/10"
           />
         </div>
 
+        {/* Loading */}
         {loading && (
-          <div className="py-20 flex flex-col items-center text-center">
-            <Loader2 className="w-8 h-8 animate-spin text-[#234737]" />
-            <p className="mt-4 text-sm text-[#252A24]/60">
-              Loading wholesale collection...
-            </p>
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <div
+                key={index}
+                className="overflow-hidden rounded-xl border border-[#E8DDCB] bg-white animate-pulse"
+              >
+                <div className="aspect-square bg-[#EAE5DC]" />
+                <div className="p-4 space-y-3">
+                  <div className="h-4 rounded bg-[#EAE5DC] w-3/4" />
+                  <div className="h-4 rounded bg-[#EAE5DC] w-1/2" />
+                  <div className="h-10 rounded bg-[#EAE5DC]" />
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
+        {/* Error */}
         {!loading && error && (
-          <div className="py-12 px-5 bg-red-50 border border-red-200 rounded-lg text-center">
-            <AlertCircle className="w-7 h-7 text-red-600 mx-auto" />
-            <p className="mt-3 text-sm text-red-700">{error}</p>
+          <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-12 text-center">
+            <AlertCircle className="mx-auto h-12 w-12 text-red-600" />
+
+            <h3 className="mt-4 text-xl font-semibold text-red-700">
+              Wholesale products could not be loaded.
+            </h3>
+
+            <p className="mt-2 text-sm text-red-600">
+              Please check your connection and try again.
+            </p>
+
             <button
               type="button"
-              onClick={() => window.location.reload()}
-              className="mt-4 px-4 py-2 rounded-md bg-[#234737] text-white text-sm"
+              onClick={() => void loadProducts()}
+              className="mt-6 inline-flex items-center justify-center gap-2 rounded-lg bg-[#234737] px-5 py-3 text-white font-medium hover:bg-[#1A3529] transition-colors"
             >
+              <RefreshCw className="h-4 w-4" />
               Try Again
             </button>
           </div>
         )}
 
+        {/* Empty state */}
         {!loading && !error && filteredProducts.length === 0 && (
-          <div className="py-16 px-5 text-center border border-dashed border-[#D8CCB9] rounded-xl">
-            <ShoppingBag className="w-10 h-10 mx-auto text-[#684631]/50" />
+          <div className="rounded-2xl border border-[#E8DDCB] bg-white px-5 py-12 text-center">
+            <ShoppingBag className="mx-auto h-12 w-12 text-[#234737]/50" />
 
-            <h3 className="mt-4 font-serif text-xl text-[#234737]">
-              {searchQuery
+            <h3 className="mt-4 font-serif text-2xl text-[#234737]">
+              {searchTerm
                 ? 'No matching products found'
                 : 'Wholesale collection coming soon'}
             </h3>
 
-            <p className="mt-2 max-w-md mx-auto text-sm leading-6 text-[#252A24]/65">
-              {searchQuery
-                ? 'Try another product name or category.'
-                : 'Wholesale prices have not been added to any active products yet. Please check back soon.'}
+            <p className="mt-2 text-sm text-[#252A24]/65">
+              {searchTerm
+                ? 'Try another product name or clear your search.'
+                : 'Wholesale prices will appear here when products are configured in the admin panel.'}
             </p>
 
-            {searchQuery && (
+            {searchTerm && (
               <button
                 type="button"
-                onClick={() => setSearchQuery('')}
+                onClick={() => setSearchTerm('')}
                 className="mt-5 text-sm font-semibold text-[#234737] underline underline-offset-4"
               >
-                Clear search
+                Clear Search
               </button>
             )}
           </div>
         )}
 
+        {/* Products */}
         {!loading && !error && filteredProducts.length > 0 && (
-          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {filteredProducts.map((product) => {
-              const wholesalePrice = product.wholesalePrice!;
-              const minimumQuantity =
-                product.minimumWholesaleQuantity ?? 1;
+              const wholesalePrice = Number(product.wholesalePrice);
+              const minimumQuantity = getMinimumQuantity(product);
+              const image = getProductImage(product);
 
               return (
                 <article
                   key={product.id}
-                  className="group bg-white border border-[#EFE6D7] rounded-lg overflow-hidden flex flex-col hover:shadow-lg transition-shadow"
+                  className="group flex flex-col overflow-hidden rounded-xl border border-[#E8DDCB] bg-white transition-shadow hover:shadow-lg"
                 >
                   <Link
                     to={`/product/${product.slug}`}
-                    className="relative block aspect-[4/5] bg-[#EFE6D7]/40 overflow-hidden"
+                    className="relative block aspect-square overflow-hidden bg-[#F1EDE5]"
+                    aria-label={`View ${product.name}`}
                   >
-                    {product.images?.[0] ? (
+                    {image ? (
                       <SafeImage
-                        src={product.images[0]}
+                        src={image}
                         alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Package className="w-10 h-10 text-[#684631]/40" />
+                      <div className="flex h-full w-full items-center justify-center">
+                        <Package className="h-12 w-12 text-[#234737]/30" />
                       </div>
                     )}
 
-                    <span className="absolute top-2 left-2 px-2 py-1 rounded bg-[#234737] text-white text-[9px] sm:text-[10px] uppercase tracking-wider font-semibold">
+                    <span className="absolute left-2 top-2 rounded-full bg-[#234737] px-2.5 py-1 text-[10px] sm:text-xs font-semibold text-white">
                       Wholesale
                     </span>
                   </Link>
 
-                  <div className="p-3 sm:p-4 flex flex-col flex-1">
-                    <p className="text-[10px] uppercase tracking-wider text-[#684631]/80">
-                      {product.categoryName}
+                  <div className="flex flex-1 flex-col p-3 sm:p-4">
+                    <p className="mb-1 text-[10px] sm:text-xs uppercase tracking-wider text-[#684631]/75">
+                      {product.categoryName || 'DripNest'}
                     </p>
 
-                    <Link to={`/product/${product.slug}`}>
-                      <h3 className="mt-1.5 font-serif text-sm sm:text-base leading-snug text-[#234737] line-clamp-2 hover:underline underline-offset-4">
-                        {product.name}
-                      </h3>
+                    <Link
+                      to={`/product/${product.slug}`}
+                      className="line-clamp-2 min-h-10 text-sm sm:text-base font-semibold text-[#252A24] hover:text-[#234737]"
+                    >
+                      {product.name}
                     </Link>
 
                     <div className="mt-3">
-                      <p className="text-[10px] uppercase tracking-wider text-[#252A24]/55">
-                        Wholesale price / piece
+                      <p className="text-[10px] sm:text-xs text-[#252A24]/55">
+                        Wholesale price
                       </p>
 
-                      <p className="mt-0.5 text-lg sm:text-xl font-semibold text-[#234737] tabular-nums">
-                        {formatPrice(wholesalePrice)}
+                      <p className="text-xl sm:text-2xl font-semibold text-[#234737]">
+                        ₹{wholesalePrice.toLocaleString('en-IN')}
                       </p>
 
-                      {typeof product.price === 'number' && (
-                        <p className="mt-1 text-xs text-[#252A24]/55">
-                          Retail: {formatPrice(product.price)}
-                        </p>
-                      )}
+                      <p className="mt-1 text-xs text-[#252A24]/65">
+                        Minimum order: {minimumQuantity} units
+                      </p>
                     </div>
 
-                    <div className="mt-3 px-2.5 py-2 rounded-md bg-[#F8F5EF] text-xs text-[#252A24]/75">
-                      Minimum order:{' '}
-                      <span className="font-semibold text-[#234737]">
-                        {minimumQuantity} {minimumQuantity === 1 ? 'piece' : 'pieces'}
-                      </span>
-                    </div>
-
-                    <div className="mt-auto pt-4 flex flex-col gap-2">
-                      <a
-                        href={getWhatsAppLink(product)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 w-full px-3 py-2.5 rounded-md bg-[#234737] text-white text-xs sm:text-sm font-semibold hover:bg-[#1A3529] transition-colors"
-                      >
-                        <MessageCircle className="w-4 h-4" />
+                    <a
+                      href={getWhatsAppLink(product)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-auto pt-4"
+                    >
+                      <span className="flex min-h-10 w-full items-center justify-center gap-1.5 rounded-lg bg-[#234737] px-2 py-2 text-xs sm:text-sm font-semibold text-white transition-colors hover:bg-[#1A3529]">
+                        <MessageCircle className="h-4 w-4 shrink-0" />
                         Enquire on WhatsApp
-                      </a>
-
-                      <Link
-                        to={`/product/${product.slug}`}
-                        className="inline-flex items-center justify-center gap-1.5 w-full px-3 py-2 text-xs font-semibold text-[#234737] border border-[#EFE6D7] rounded-md hover:bg-[#F8F5EF] transition-colors"
-                      >
-                        View Product
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </Link>
-                    </div>
+                      </span>
+                    </a>
                   </div>
                 </article>
               );
@@ -353,35 +336,37 @@ export const WholesalePage: React.FC = () => {
         )}
       </section>
 
-      {/* Wholesale enquiry CTA */}
-      <section className="bg-[#EFE6D7]/60 border-t border-[#EFE6D7]">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16 text-center">
-          <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#234737] text-[#F8F5EF]">
-            <MessageCircle className="w-5 h-5" />
-          </span>
+      {/* Bulk order contact section */}
+      <section className="border-t border-[#E8DDCB] bg-[#F1EADF]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-14 sm:py-20 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#234737] text-white">
+            <MessageCircle className="h-7 w-7" />
+          </div>
 
-          <h2 className="mt-5 font-serif text-3xl text-[#234737]">
+          <h2 className="mt-7 font-serif text-3xl sm:text-5xl text-[#234737]">
             Planning a bulk order?
           </h2>
 
-          <p className="mt-3 max-w-xl mx-auto text-sm leading-6 text-[#252A24]/70">
+          <p className="mt-5 text-base sm:text-lg leading-8 text-[#252A24]/70">
             Contact DripNest to discuss quantities, product availability,
             shipping and your wholesale requirements.
           </p>
 
           <a
             href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-              'Hello DripNest, I would like to enquire about wholesale and bulk purchasing.'
+              'Hello DripNest, I would like to discuss a wholesale order. Please share your bulk pricing and availability.'
             )}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-6 inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#234737] text-white rounded-md text-sm font-semibold hover:bg-[#1A3529] transition-colors"
+            className="mt-7 inline-flex items-center justify-center gap-2 rounded-lg bg-[#234737] px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-[#1A3529]"
           >
-            <MessageCircle className="w-4 h-4" />
-            Contact Wholesale Team
+            Contact Us on WhatsApp
+            <ArrowRight className="h-4 w-4" />
           </a>
         </div>
       </section>
     </main>
   );
 };
+
+export default WholesalePage;
