@@ -5,6 +5,8 @@ import {
   Sparkles,
   Star,
   MessageSquarePlus,
+  Package,
+  MessageCircle,
 } from 'lucide-react';
 
 import { Product, Category, Review, StoreSettings } from '../types';
@@ -452,6 +454,92 @@ export const HomePage: React.FC = () => {
           onRetry={() => fetchProductList(true)}
           onProductClick={(product) => setSelectedProduct(product)}
         />
+      </section>
+
+      {/* 4. Wholesale Collection Banner */}
+      <section className="mx-4 sm:mx-6 lg:mx-auto max-w-7xl overflow-hidden rounded-2xl border border-[#DED3C1] bg-[#EFE6D7]/60">
+        <div className="grid grid-cols-1 lg:grid-cols-2">
+          {/* Wholesale Content */}
+          <div className="flex flex-col justify-center p-6 sm:p-10 lg:p-14">
+            <div className="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-[#D8C8AC] bg-white/70 px-3 py-2 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.16em] text-[#684631]">
+              <Package className="h-4 w-4" />
+              <span>For Retailers & Bulk Buyers</span>
+            </div>
+
+            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal leading-tight text-[#234737]">
+              Buying in Bulk?
+              <br />
+              <span className="italic">Let's Grow Together.</span>
+            </h2>
+
+            <p className="mt-4 max-w-xl text-sm sm:text-base leading-7 text-[#252A24]/75">
+              Discover the DripNest Wholesale Collection. Explore special
+              wholesale prices on selected wooden homeware, handcrafted
+              essentials and decor for your business.
+            </p>
+
+            <div className="mt-6 grid grid-cols-2 gap-3 text-xs sm:text-sm text-[#234737]">
+              <div className="flex items-start gap-2">
+                <Package className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>Bulk order enquiries</span>
+              </div>
+
+              <div className="flex items-start gap-2">
+                <MessageCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>Direct WhatsApp support</span>
+              </div>
+            </div>
+
+            <div className="mt-7 flex flex-col sm:flex-row gap-3">
+              <Link
+                to="/wholesale"
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-[#234737] px-6 py-3.5 text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#F8F5EF] transition-colors hover:bg-[#1A3529]"
+              >
+                Explore Wholesale
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+
+              <a
+                href={`https://wa.me/918218167743?text=${encodeURIComponent(
+                  'Hello DripNest, I am interested in wholesale and bulk orders. Please share product availability and pricing.'
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-md border border-[#234737] px-6 py-3.5 text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#234737] transition-colors hover:bg-white/60"
+              >
+                <MessageCircle className="h-4 w-4" />
+                Enquire Now
+              </a>
+            </div>
+
+            <p className="mt-4 text-xs text-[#252A24]/55">
+              Wholesale prices and minimum order quantities vary by product.
+            </p>
+          </div>
+
+          {/* Wholesale Visual */}
+          <div className="relative min-h-[240px] sm:min-h-[340px] lg:min-h-full bg-[#D8C8AC]">
+            <SafeImage
+              src="https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&w=1200&q=85"
+              alt="Natural wooden homeware and decor for wholesale buyers"
+              fallbackText="DripNest Wholesale Collection"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+
+            <div className="absolute inset-0 bg-gradient-to-t from-[#172D22]/70 via-transparent to-transparent pointer-events-none" />
+
+            <div className="absolute bottom-5 left-5 right-5 sm:bottom-8 sm:left-8">
+              <p className="text-[10px] sm:text-xs uppercase tracking-[0.2em] text-white/80">
+                DripNest Business
+              </p>
+              <p className="mt-2 font-serif text-2xl sm:text-3xl text-white">
+                Thoughtful Products.
+                <br />
+                Better Bulk Buying.
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* 4. Brand Story: DripNest Woodcraft & Timeless Living */}
