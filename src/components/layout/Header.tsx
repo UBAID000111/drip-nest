@@ -14,20 +14,19 @@ import { useAuth } from '../../context/AuthContext';
 
 
 
+
 const NAV_ITEMS = [
   { label: 'Home', path: '/' },
   { label: 'Shop', path: '/shop' },
   { label: 'Wholesale', path: '/wholesale' },
-  {
-    label: 'Kitchen & Home',
-    path: '/category/kitchen-and-home-accessories',
-  },
+  { label: 'Kitchen & Home', path: '/category/kitchen-and-home-accessories' },
   { label: 'Drinkware', path: '/category/drinkware' },
   { label: 'Dining', path: '/category/dining' },
   { label: 'Home Decor', path: '/category/home-decor' },
   { label: 'Accessories', path: '/category/accessories' },
   { label: 'Reviews', path: '/reviews' },
 ];
+
 
 
   {
