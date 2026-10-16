@@ -22,6 +22,7 @@ import { AboutPage } from './pages/AboutPage';
 import { ContactPage } from './pages/ContactPage';
 import { LegalPage } from './pages/LegalPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { WholesalePage } from './pages/WholesalePage';
 
 // Admin Pages
 import { AdminLoginPage } from './pages/admin/AdminLoginPage';
@@ -55,6 +56,15 @@ export default function App() {
                 </Layout>
               }
             />
+
+<Route
+  path="/wholesale"
+  element={
+    <Layout>
+      <WholesalePage />
+    </Layout>
+  }
+/>
             <Route
               path="/category/:slug"
               element={
