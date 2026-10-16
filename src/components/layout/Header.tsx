@@ -12,23 +12,10 @@ import { BrandLogo } from '../common/BrandLogo';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 
-
-
-
 const NAV_ITEMS = [
   { label: 'Home', path: '/' },
   { label: 'Shop', path: '/shop' },
   { label: 'Wholesale', path: '/wholesale' },
-  { label: 'Kitchen & Home', path: '/category/kitchen-and-home-accessories' },
-  { label: 'Drinkware', path: '/category/drinkware' },
-  { label: 'Dining', path: '/category/dining' },
-  { label: 'Home Decor', path: '/category/home-decor' },
-  { label: 'Accessories', path: '/category/accessories' },
-  { label: 'Reviews', path: '/reviews' },
-];
-
-
-
   {
     label: 'Kitchen & Home',
     path: '/category/kitchen-and-home-accessories',
@@ -95,15 +82,18 @@ export const Header: React.FC = () => {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20 gap-4">
-            {/* Zone 1: Brand Wordmark & Leaf Mark */}
+            {/* Brand Logo */}
             <div className="flex items-center">
               <BrandLogo showTagline={true} />
             </div>
 
-            {/* Zone 2: Desktop Navigation */}
+            {/* Desktop Navigation */}
             <nav className="hidden xl:flex items-center gap-6 text-[13px] font-medium tracking-wide text-[#252A24]/80">
               {NAV_ITEMS.map((item) => {
-                const isActive = location.pathname === item.path;
+                const isActive =
+                  location.pathname === item.path ||
+                  (item.path !== '/' &&
+                    location.pathname.startsWith(`${item.path}/`));
 
                 return (
                   <Link
@@ -123,9 +113,9 @@ export const Header: React.FC = () => {
               })}
             </nav>
 
-            {/* Zone 3: Search, Cart & Mobile Toggle */}
+            {/* Search, Cart & Mobile Toggle */}
             <div className="flex items-center gap-2.5 shrink-0">
-              {/* Search Toggle Button */}
+              {/* Search Toggle */}
               <button
                 type="button"
                 onClick={() => setSearchOpen(!searchOpen)}
@@ -136,7 +126,7 @@ export const Header: React.FC = () => {
                 <Search className="w-5 h-5" />
               </button>
 
-              {/* Shopping Cart Button */}
+              {/* Shopping Cart */}
               <button
                 type="button"
                 onClick={openCart}
@@ -197,7 +187,7 @@ export const Header: React.FC = () => {
         )}
       </header>
 
-      {/* Mobile Slide-Out Drawer Navigation */}
+      {/* Mobile Slide-Out Drawer */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 flex">
           {/* Backdrop */}
@@ -224,12 +214,16 @@ export const Header: React.FC = () => {
             {/* Mobile Navigation Links */}
             <div className="py-6 flex flex-col gap-1">
               {NAV_ITEMS.map((item) => {
-                const isActive = location.pathname === item.path;
+                const isActive =
+                  location.pathname === item.path ||
+                  (item.path !== '/' &&
+                    location.pathname.startsWith(`${item.path}/`));
 
                 return (
                   <Link
                     key={item.path}
                     to={item.path}
+                    onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center justify-between px-3 py-3 rounded-md text-sm font-medium transition-colors ${
                       isActive
                         ? 'bg-[#EFE6D7] text-[#234737] font-semibold'
