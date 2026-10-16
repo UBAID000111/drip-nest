@@ -1,3 +1,4 @@
+
 export interface Product {
   id: string;
   name: string;
@@ -5,8 +6,15 @@ export interface Product {
   description: string;
   categoryId: string;
   categoryName: string;
+
+  // Retail pricing
   price: number;
   compareAtPrice?: number | null;
+
+  // Wholesale pricing
+  wholesalePrice?: number | null;
+  minimumWholesaleQuantity?: number | null;
+
   images: string[];
   material: string;
   dimensions: string;
@@ -16,6 +24,7 @@ export interface Product {
   createdAt?: any;
   updatedAt?: any;
 }
+
 
 export interface Category {
   id: string;
