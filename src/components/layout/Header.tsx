@@ -13,6 +13,7 @@ import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 
 
+
 const NAV_ITEMS = [
   { label: 'Home', path: '/' },
   { label: 'Shop', path: '/shop' },
@@ -27,6 +28,7 @@ const NAV_ITEMS = [
   { label: 'Accessories', path: '/category/accessories' },
   { label: 'Reviews', path: '/reviews' },
 ];
+
 
   {
     label: 'Kitchen & Home',
