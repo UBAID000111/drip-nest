@@ -16,21 +16,6 @@ import { SafeImage } from '../components/common/SafeImage';
 
 import { Seo } from '../components/common/Seo';
 
-// HomePage
-<Seo
-  title="DripNest Decor | Wooden Handicrafts & Home Decor"
-  description="Shop handcrafted wooden home decor, wooden roti boxes, serving trays and kitchen essentials at DripNest Decor. Handmade in India."
-  path="/"
-/>
-
-// ShopPage
-<Seo
-  title="Shop Wooden Handicraft Items Online | DripNest Decor"
-  description="Browse handcrafted wooden items, wooden home decor and kitchen essentials. Order online with delivery across India."
-  path="/shop"
-/>
-
-
 const WHATSAPP_NUMBER = '918218167743';
 
 export const WholesalePage: React.FC = () => {
@@ -132,6 +117,12 @@ export const WholesalePage: React.FC = () => {
 
   return (
     <main className="min-h-screen bg-[#F8F5EF] text-[#252A24]">
+      <Seo
+        title="Wholesale Wooden Handicrafts & Home Decor India | DripNest Decor"
+        description="Buy handcrafted wooden handicraft items, wooden home decor and kitchenware in bulk. Wholesale prices for retailers, resellers and businesses across India."
+        path="/wholesale"
+      />
+
       {/* Hero */}
       <section className="bg-[#234737] text-[#F8F5EF]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
