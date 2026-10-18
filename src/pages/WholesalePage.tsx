@@ -14,6 +14,23 @@ import { getProducts } from '../services/productService';
 import { Product } from '../types';
 import { SafeImage } from '../components/common/SafeImage';
 
+import { Seo } from '../components/common/Seo';
+
+// HomePage
+<Seo
+  title="DripNest Decor | Wooden Handicrafts & Home Decor"
+  description="Shop handcrafted wooden home decor, wooden roti boxes, serving trays and kitchen essentials at DripNest Decor. Handmade in India."
+  path="/"
+/>
+
+// ShopPage
+<Seo
+  title="Shop Wooden Handicraft Items Online | DripNest Decor"
+  description="Browse handcrafted wooden items, wooden home decor and kitchen essentials. Order online with delivery across India."
+  path="/shop"
+/>
+
+
 const WHATSAPP_NUMBER = '918218167743';
 
 export const WholesalePage: React.FC = () => {
