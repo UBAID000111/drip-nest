@@ -235,7 +235,6 @@ export const ProductDetailPage: React.FC = () => {
 
   return (
     <>
-      <Helmet>
         <title>{`${product.name} | DripNest Decor`}</title>
 
         <meta name="description" content={productDescription.slice(0, 155)} />
@@ -267,7 +266,6 @@ export const ProductDetailPage: React.FC = () => {
         <script type="application/ld+json">
           {JSON.stringify(structuredData)}
         </script>
-      </Helmet>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14 space-y-16">
         {/* Breadcrumb navigation */}
