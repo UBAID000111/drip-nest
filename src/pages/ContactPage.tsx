@@ -1,23 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, Phone, ShieldCheck, Send, CheckCircle, Clock } from 'lucide-react';
 
-
 import { Seo } from '../components/common/Seo';
-
-// HomePage
-<Seo
-  title="DripNest Decor | Wooden Handicrafts & Home Decor"
-  description="Shop handcrafted wooden home decor, wooden roti boxes, serving trays and kitchen essentials at DripNest Decor. Handmade in India."
-  path="/"
-/>
-
-// ShopPage
-<Seo
-  title="Shop Wooden Handicraft Items Online | DripNest Decor"
-  description="Browse handcrafted wooden items, wooden home decor and kitchen essentials. Order online with delivery across India."
-  path="/shop"
-/>
-
 
 export const ContactPage: React.FC = () => {
   const [name, setName] = useState('');
@@ -40,6 +24,12 @@ export const ContactPage: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-12">
+      <Seo
+        title="Contact DripNest Decor | Wooden Handicraft Orders & Enquiries"
+        description="Contact DripNest Decor for orders, custom wooden handicraft and home decor enquiries, and wholesale. Email or call Monday to Saturday, 10 AM to 7 PM IST."
+        path="/contact"
+      />
+
       <div className="max-w-3xl">
         <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#684631] block mb-1">
           Direct Communication
