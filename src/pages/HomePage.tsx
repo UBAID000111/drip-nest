@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   ArrowRight,
   Sparkles,
@@ -21,6 +21,7 @@ import { ProductDetailModal } from '../components/shop/ProductDetailModal';
 import { ReviewCard } from '../components/reviews/ReviewCard';
 import { ReviewFormModal } from '../components/reviews/ReviewFormModal';
 import { SafeImage } from '../components/common/SafeImage';
+import { Seo } from '../components/common/Seo';
 
 // Category fallback images
 const CATEGORY_IMAGES: Record<string, string> = {
@@ -89,8 +90,6 @@ export const HomePage: React.FC = () => {
 
   const collectionRef = useRef<HTMLDivElement>(null);
   const craftRef = useRef<HTMLDivElement>(null);
-
-  const navigate = useNavigate();
 
   // Load initial store data
   useEffect(() => {
@@ -242,6 +241,12 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="space-y-20 sm:space-y-28">
+      <Seo
+        title="Wooden Handicrafts & Home Decor Online India | DripNest Decor"
+        description="Shop handcrafted wooden handicraft items, wooden home decor, roti boxes, serving trays and kitchen essentials. Handmade in India by DripNest Decor."
+        path="/"
+      />
+
       {/* 1. Hero Section */}
       <section className="relative overflow-hidden bg-[#F8F5EF] pt-8 sm:pt-14 pb-12 sm:pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -370,11 +375,9 @@ export const HomePage: React.FC = () => {
         {/* Category Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
           {categories.map((cat) => (
-            <div
+            <Link
               key={cat.id}
-              onClick={() =>
-                navigate(`/shop?category=${encodeURIComponent(cat.id)}`)
-              }
+              to={`/category/${cat.slug}`}
               className="group cursor-pointer bg-white border border-[#EFE6D7] rounded-lg overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-1 flex flex-col justify-between"
             >
               <div className="relative aspect-[4/3] bg-[#EFE6D7] overflow-hidden">
@@ -407,7 +410,7 @@ export const HomePage: React.FC = () => {
                   <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
