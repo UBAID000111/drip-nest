@@ -5,6 +5,23 @@ import { getApprovedReviews } from '../services/reviewService';
 import { ReviewCard } from '../components/reviews/ReviewCard';
 import { ReviewFormModal } from '../components/reviews/ReviewFormModal';
 
+import { Seo } from '../components/common/Seo';
+
+// HomePage
+<Seo
+  title="DripNest Decor | Wooden Handicrafts & Home Decor"
+  description="Shop handcrafted wooden home decor, wooden roti boxes, serving trays and kitchen essentials at DripNest Decor. Handmade in India."
+  path="/"
+/>
+
+// ShopPage
+<Seo
+  title="Shop Wooden Handicraft Items Online | DripNest Decor"
+  description="Browse handcrafted wooden items, wooden home decor and kitchen essentials. Order online with delivery across India."
+  path="/shop"
+/>
+
+
 export const ReviewsPage: React.FC = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [averageRating, setAverageRating] = useState<number>(0);
