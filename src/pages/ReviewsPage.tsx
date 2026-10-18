@@ -7,21 +7,6 @@ import { ReviewFormModal } from '../components/reviews/ReviewFormModal';
 
 import { Seo } from '../components/common/Seo';
 
-// HomePage
-<Seo
-  title="DripNest Decor | Wooden Handicrafts & Home Decor"
-  description="Shop handcrafted wooden home decor, wooden roti boxes, serving trays and kitchen essentials at DripNest Decor. Handmade in India."
-  path="/"
-/>
-
-// ShopPage
-<Seo
-  title="Shop Wooden Handicraft Items Online | DripNest Decor"
-  description="Browse handcrafted wooden items, wooden home decor and kitchen essentials. Order online with delivery across India."
-  path="/shop"
-/>
-
-
 export const ReviewsPage: React.FC = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [averageRating, setAverageRating] = useState<number>(0);
@@ -49,6 +34,12 @@ export const ReviewsPage: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-12">
+      <Seo
+        title="Customer Reviews | DripNest Decor Wooden Handicrafts"
+        description="Read genuine customer reviews of DripNest handcrafted wooden home decor, serving trays, roti boxes and kitchen essentials."
+        path="/reviews"
+      />
+
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-[#EFE6D7] pb-8 gap-6">
         <div>
