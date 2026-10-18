@@ -6,6 +6,7 @@ import { getCategories } from '../services/categoryService';
 import { ProductGrid } from '../components/shop/ProductGrid';
 import { FilterBar } from '../components/shop/FilterBar';
 import { ProductDetailModal } from '../components/shop/ProductDetailModal';
+import { Seo } from '../components/common/Seo';
 
 export const ShopPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -128,6 +129,13 @@ export const ShopPage: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
+      <Seo
+        title="Shop Wooden Handicraft Items & Home Decor Online | DripNest Decor"
+        description="Browse handcrafted wooden items, wooden home decor, serving trays, roti boxes and kitchen essentials. Order online with delivery across India."
+        path="/shop"
+        noindex={Boolean(searchParam.trim())}
+      />
+
       {/* Header */}
       <div className="mb-8">
         <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#684631] block mb-1">
