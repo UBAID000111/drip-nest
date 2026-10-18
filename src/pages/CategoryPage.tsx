@@ -74,6 +74,8 @@ export const CategoryPage: React.FC = () => {
   if (!loading && !category) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-20 text-center">
+        <title>Category Not Found | DripNest Decor</title>
+        <meta name="robots" content="noindex, follow" />
         <h2 className="font-serif text-2xl text-[#234737] mb-2">Category Not Found</h2>
         <p className="text-sm text-[#252A24]/70 mb-6">
           The requested homeware category does not exist or has been modified.
@@ -89,8 +91,44 @@ export const CategoryPage: React.FC = () => {
     );
   }
 
+  const categoryUrl = `https://dripnest.site/category/${slug ?? ''}`;
+  const categoryDescription = (
+    category?.description?.trim() ||
+    `Shop handcrafted ${category?.name?.toLowerCase() ?? 'wooden'} from DripNest Decor. Handmade wooden home decor and kitchen essentials, delivered across India.`
+  )
+    .replace(/\s+/g, ' ')
+    .slice(0, 155);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
+      {category && (
+        <>
+          <title>{`${category.name} Online India | DripNest Decor`}</title>
+          <meta name="description" content={categoryDescription} />
+          <meta name="robots" content="index, follow" />
+          <link rel="canonical" href={categoryUrl} />
+          <meta property="og:type" content="website" />
+          <meta property="og:site_name" content="DripNest Decor" />
+          <meta property="og:title" content={`${category.name} | DripNest Decor`} />
+          <meta property="og:description" content={categoryDescription} />
+          <meta property="og:url" content={categoryUrl} />
+          {category.imageUrl && (
+            <meta property="og:image" content={category.imageUrl} />
+          )}
+          <meta name="twitter:card" content="summary_large_image" />
+          <script type="application/ld+json">
+            {JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'CollectionPage',
+              name: category.name,
+              description: categoryDescription,
+              url: categoryUrl,
+              isPartOf: { '@type': 'WebSite', name: 'DripNest Decor', url: 'https://dripnest.site' },
+            })}
+          </script>
+        </>
+      )}
+
       {/* Category Hero Banner */}
       <div className="bg-white border border-[#EFE6D7] rounded-xl p-6 sm:p-10 mb-12 shadow-xs grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
         <div className="md:col-span-8 space-y-3">
